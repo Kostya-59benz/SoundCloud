@@ -29,7 +29,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'drf_yasg',
-    'src.oauth'
+    'src.oauth',
 
     
 ]
@@ -120,3 +120,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+
+ALGORITHM = 'HS256'
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
+
+
+GOOGLE_CLIENT_ID ='807132324214-kqi2rrrqsf1bha57lah0nla6lqot4j17.apps.googleusercontent.com'

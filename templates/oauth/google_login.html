@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="no-referrer-when-downgrade">
     <meta name="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
-    <meta name="google-signin-client_id" content="807132324214-j4jbskaujqp2o7th50nc2ov892s0k47k.apps.googleusercontent.com">
+    <meta name="google-signin-client_id" content="807132324214-kqi2rrrqsf1bha57lah0nla6lqot4j17.apps.googleusercontent.com">
     <title>Document</title>
 </head>
 
@@ -24,7 +24,7 @@
             let token = googleUser.getAuthResponse().id_token
             console.log('Token: ' + token)
 
-            fetch('http://localhost/api/v1/auth/google/', {
+            fetch('http://localhost:8000/api/v1/auth/google/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json;charset=UTF-8' },
                 body: JSON.stringify({
@@ -38,6 +38,7 @@
 
         function onFailure(error) {
             console.log(error)
+            console.error("Google Sign-In failed:", error);
         }
 
         function renderButton() {
