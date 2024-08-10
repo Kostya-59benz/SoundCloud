@@ -128,3 +128,33 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
 
 
 GOOGLE_CLIENT_ID ='807132324214-kqi2rrrqsf1bha57lah0nla6lqot4j17.apps.googleusercontent.com'
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': ('src.oauth.services.auth_backend.AuthBackend',),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
+}
+
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS':
+    {
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
+        }
+    }
+
+}
+
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+    "http://127.0.0.1",
+    "http://localhost:3000",
+]

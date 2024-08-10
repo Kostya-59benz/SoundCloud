@@ -1,60 +1,82 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="referrer" content="no-referrer-when-downgrade">
-    <meta name="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
-    <meta name="google-signin-client_id" content="807132324214-kqi2rrrqsf1bha57lah0nla6lqot4j17.apps.googleusercontent.com">
-    <title>Document</title>
+    <title>Say hello using the People API</title>
+    <meta charset='utf-8' />
+    <meta name="google-signin-client_id" content="">
 </head>
 
 <body>
 
-    <div id="my-signin"></div>
+    <div id="g_id_onload" data-client_id="807132324214-kqi2rrrqsf1bha57lah0nla6lqot4j17.apps.googleusercontent.com"
+        data-callback="handleCredentialResponse">
 
-
-
+    </div>
+    <div class="g_id_signin" data-type="standard"></div>
     <script>
+        // Функция для декодирования Base64URL
+        function base64UrlDecode(base64Url) {
+            // Заменяем символы Base64URL на символы Base64
+            let base64 = base64Url
+                .replace(/-/g, '+')
+                .replace(/_/g, '/');
 
-        function onSuccess(googleUser) {
-            let profile = googleUser.getBasicProfile()
-            console.log('Email: ' + profile.getEmail())
-            let token = googleUser.getAuthResponse().id_token
-            console.log('Token: ' + token)
+            // Добавляем необходимые символы для корректного декодирования
+            const padding = base64.length % 4;
+            if (padding > 0) {
+                base64 += '='.repeat(4 - padding);
+            }
 
+            // Декодируем Base64 строку
+            const decoded = atob(base64);
+            return decoded;
+        }
+
+        // Функция для декодирования JWT
+        function decodeJWT(token) {
+            // Разбиваем токен на части
+            const parts = token.split('.');
+
+            if (parts.length !== 3) {
+                throw new Error('Invalid JWT token');
+            }
+
+            // Декодируем заголовок и полезную нагрузку
+            const header = JSON.parse(base64UrlDecode(parts[0]));
+            const payload = JSON.parse(base64UrlDecode(parts[1]));
+
+            return {
+                header: header,
+                payload: payload
+            };
+        }
+
+        function handleCredentialResponse(response) {
+            // decodeJwtResponse() is a custom function defined by you
+            // to decode the credential response.
+            const responsePayload = decodeJWT(response.credential);
+            
+            console.log("ID: " + responsePayload.payload.sub);
+            var token = response.credential
+            print(token)
+            console.log("Email: " + responsePayload.payload.email);
+
+            var email = responsePayload.payload.email
             fetch('http://localhost:8000/api/v1/auth/google/', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+                headers: { 'Content-Type':'application/json;charset=UTF-8' },
                 body: JSON.stringify({
-                    email: profile.getEmail(),
+                    email: email,
                     token: token
                 })
-            })
-                .then(res => res.json())
-                .then(data => console.log('ID: ' + data.user_id + '\nToken: ' + data.access_token))
+            }).then(response => response.json())
+            .then(data => console.log("Response data:", data))
         }
 
-        function onFailure(error) {
-            console.log(error)
-            console.error("Google Sign-In failed:", error);
-        }
-
-        function renderButton() {
-            gapi.signin2.render('my-signin', {
-                'scope': 'profile email',
-                'width': 240,
-                'height': 50,
-                'longtitle': true,
-                'theme': 'dark',
-                'onsuccess': onSuccess,
-                'onfailure': onFailure
-            });
-        }
     </script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 
-    <script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
 </body>
 
 </html>

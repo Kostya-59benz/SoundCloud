@@ -1,12 +1,12 @@
-
 from rest_framework.exceptions import AuthenticationFailed
-
+from django.conf import settings
 from google.oauth2 import id_token 
 from google.auth.transport import requests
+
 from src.oauth import serializer
 from . import base_auth
 from ..models import AuthUser
-from django.conf import settings
+
 
 def check_google_auth(google_user: serializer.GoogleAuth) -> dict:
 
