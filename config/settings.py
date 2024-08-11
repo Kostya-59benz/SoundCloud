@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    "corsheaders",
     'drf_yasg',
     'src.oauth',
 
@@ -132,9 +133,7 @@ GOOGLE_CLIENT_ID ='807132324214-kqi2rrrqsf1bha57lah0nla6lqot4j17.apps.googleuser
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': ('src.oauth.services.auth_backend.AuthBackend',),
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
-    ],
+
 }
 
 
