@@ -2,9 +2,9 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
-from django.http import JsonResponse
+
 # Create your views here.
-from ..services.google import check_google_auth
+from ..services import google, spotify 
 from .. import serializer
 
 def google_login(request):
@@ -13,12 +13,28 @@ def google_login(request):
 
 
 
+def spotify_login(request):
+    """ Страница входа через Spotify
+    """
+    return render(request, 'oauth/spotify_login.html')
+
+
+
 @api_view(['POST'])
 def google_auth(request):
     """ Accepting authorization from Google"""
     google_data = serializer.GoogleAuth(data=request.data)
     if google_data.is_valid():
-        token = check_google_auth(google_data.data)
+        token = google.check_google_auth(google_data.data)
         return Response(token)
     else:
         AuthenticationFailed(code=403, detail='Bad data google')
+
+
+
+@api_view(['GET'])
+def spotify_auth(request):
+    """ Подтверждение авторизации через Spotify
+    """
+    token = spotify.spotify_auth(request.query_params.get('code'))
+    return Response(token)

@@ -12,7 +12,7 @@ def check_google_auth(google_user: serializer.GoogleAuth) -> dict:
 
 
     try:
-        id_token.verify_oauth2_token(google_user['token'], requests.Request(), settings.GOOGLE_CLIENT_ID)
+       id_info =  id_token.verify_oauth2_token(google_user['token'], requests.Request(), settings.GOOGLE_CLIENT_ID)
 
     
     except ValueError:
@@ -20,6 +20,6 @@ def check_google_auth(google_user: serializer.GoogleAuth) -> dict:
     
 
 
-    user, _ = AuthUser.objects.get_or_create(email=google_user['email'])
+    user, _ = AuthUser.objects.get_or_create(email=id_info['email'])
 
     return base_auth.create_token(user.id)

@@ -28,9 +28,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'silk',
     "corsheaders",
     'drf_yasg',
     'src.oauth',
+    'src.audio_library'
 
     
 ]
@@ -43,6 +45,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'silk.middleware.SilkyMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -130,9 +133,11 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
 
 GOOGLE_CLIENT_ID ='807132324214-kqi2rrrqsf1bha57lah0nla6lqot4j17.apps.googleusercontent.com'
 
+SPOTIFY_SECRET = '39fa55224a234e08ad18bf25d6cb0fa6'
+SPOTIFY_CLIENT_ID = '55ff74bef3a5445e90ed32496bb5f4bb'
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': ('src.oauth.services.auth_backend.AuthBackend',),
+    'DEFAULT_AUTHENTICATION_CLASSES': ['src.oauth.services.auth_backend.AuthBackend',],
 
 }
 

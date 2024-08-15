@@ -1,12 +1,35 @@
 from rest_framework import serializers
-from .models import AuthUser
+from . import models
 
 
 class UserSerilizer(serializers.ModelSerializer):
     
     class Meta:
-        model = AuthUser
+        model = models.AuthUser
         fields = ('avatar', 'country', 'city', 'bio', 'display_name')
+
+
+
+class SocialLinkSerializer(serializers.ModelSerializer):
+    
+
+    id = serializers.IntegerField(read_only=True)
+    class Meta:
+        model = models.SocialLink
+        fields = ('id', 'link',)
+
+
+
+class AuthorSerilizer(serializers.ModelSerializer):
+
+    social_links = SocialLinkSerializer(many=True)
+    
+    class Meta:
+        model = models.AuthUser
+        fields = ('id','avatar', 'country', 'city', 'bio', 'display_name', 'social_links')
+
+
+
 
 
 class GoogleAuth(serializers.Serializer):

@@ -2,6 +2,7 @@ from django.db import models
 from django.core.validators import FileExtensionValidator
 # Create your models here.
 from src.base.services import get_path_upload_avatar, validate_size_image
+
 class AuthUser(models.Model):
 
     email = models.EmailField(max_length=150, unique=True)
@@ -21,7 +22,7 @@ class AuthUser(models.Model):
     def is_authenticated(self):
         """ Всегда возвращает True. Это способ узнать, был ли пользователь аутентифицированы
         """
-
+        return True
 
 
     def __str__(self):
@@ -50,3 +51,5 @@ class SocialLink(models.Model):
     
     def __str__(self):
         return f'{self.user}'
+    
+

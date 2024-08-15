@@ -35,8 +35,6 @@ class AuthBackend(authentication.BaseAuthentication) :
 
                 'Invalid token header. Token string should not contain invalid characters.'
             )
-        
-
         return self.authenticate_credential(token)
 
     def authenticate_credential(self, token) -> tuple:
@@ -48,7 +46,6 @@ class AuthBackend(authentication.BaseAuthentication) :
                 'Invalid authentication. Could not decode token.'
             )
         
-        print(payload)
 
         token_exp = datetime.fromtimestamp(payload['exp'],  tz=timezone.utc)
         if token_exp < datetime.now(timezone.utc):
@@ -67,6 +64,5 @@ class AuthBackend(authentication.BaseAuthentication) :
 
                 'No user matching this token was found.'
             )
-        
 
-        return user, None
+        return (user, None)
