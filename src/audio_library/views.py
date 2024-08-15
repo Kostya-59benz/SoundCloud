@@ -20,7 +20,7 @@ class LicenseView(viewsets.ModelViewSet):
     serializer_class = serializers.LicenseSerializer
     permission_classes = [IsAuthor]
 
-    def get_queryset(self, serializer):
+    def get_queryset(self   ):
         return models.License.objects.filter(user=self.request.user)
     
 

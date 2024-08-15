@@ -6,7 +6,7 @@ from . import models
 class BaseSerializer(serializers.ModelSerializer):
 
 
-    id = serializers.IntegerField()
+    id = serializers.IntegerField(read_only=True)
 
 
 
@@ -20,4 +20,4 @@ class GenreSerializer(BaseSerializer):
 class LicenseSerializer(BaseSerializer):
     class Meta:
         model = models.License
-        fields = ('id', 'name')
+        fields = ('id', 'text')

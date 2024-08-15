@@ -5,7 +5,9 @@ from . import views
 urlpatterns = [
     path('genre/', views.GenreView.as_view()),
 
-    path
+    path('license/', views.LicenseView.as_view({'get': 'list', 'post': 'create'})),
+    path('license/<int:pk>/', views.LicenseView.as_view({'put': 'update', 'delete': 'destroy'}))
+ 
 
 
 ]
