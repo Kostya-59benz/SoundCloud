@@ -31,7 +31,7 @@ class Album(models.Model):
 
     user = models.ForeignKey(AuthUser, on_delete=models.CASCADE, related_name='albums')
     name = models.CharField(max_length=50)
-    descripion = models.TextField(max_length=1000)
+    description = models.TextField(max_length=1000)
     private = models.BooleanField(default=False)
     cover = models.ImageField(
         upload_to=get_path_upload_cover_album,
@@ -59,7 +59,7 @@ class Track(models.Model):
     download = models.PositiveIntegerField(default=0)
     likes_count = models.PositiveIntegerField(default=0)
     user_of_likes = models.ManyToManyField(AuthUser, related_name='likes_of_tracks')
-    private = models.BooleanField(default=True)
+    private = models.BooleanField(default=False)
     cover = models.ImageField(
         upload_to=get_path_upload_cover_track,
         blank=True,

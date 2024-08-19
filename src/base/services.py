@@ -1,3 +1,4 @@
+import os
 
 from django.core.exceptions import ValidationError
 
@@ -10,7 +11,7 @@ def get_path_upload_avatar(instance, file):
 def get_path_upload_cover_album(instance, file):
     """ Построение пути к файлу, format: (media)/album/user_id/photo.jpg
     """
-    return f'album/user_{instance.id}/{file}'
+    return f'album/user_{instance.user.id}/{file}'
 
 def get_path_upload_cover_playlist(instance, file):
     """ Построение пути к файлу, format: (media)/playlist/user_id/photo.jpg
@@ -35,3 +36,10 @@ def validate_size_image(file_obj):
     megabite_limit = 2
     if file_obj.size > megabite_limit * 1024 * 1024:
         raise ValidationError(f" Max size of file is {megabite_limit}MB")
+    
+
+
+def delete_old_file(path_file):
+
+    if os.path.exists(path_file):
+        os.remove(path_file)

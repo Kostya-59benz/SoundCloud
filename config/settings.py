@@ -32,7 +32,8 @@ INSTALLED_APPS = [
     "corsheaders",
     'drf_yasg',
     'src.oauth',
-    'src.audio_library'
+    'src.audio_library',
+    'django_filters',
 
     
 ]
@@ -138,7 +139,10 @@ SPOTIFY_CLIENT_ID = '55ff74bef3a5445e90ed32496bb5f4bb'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': ['src.oauth.services.auth_backend.AuthBackend',],
-
+        'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny'
+    ],
+'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 }
 
 

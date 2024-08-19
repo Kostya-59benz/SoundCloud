@@ -20,7 +20,7 @@ class SocialLinkSerializer(serializers.ModelSerializer):
 
 
 
-class AuthorSerilizer(serializers.ModelSerializer):
+class AuthorSerializer(serializers.ModelSerializer):
 
     social_links = SocialLinkSerializer(many=True)
     

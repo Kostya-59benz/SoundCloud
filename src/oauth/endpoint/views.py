@@ -29,7 +29,7 @@ class AuthorView(viewsets.ReadOnlyModelViewSet):
     """ List of authors"""
 
     queryset = models.AuthUser.objects.all
-    serializer_class = serializer.AuthorSerilizer
+    serializer_class = serializer.AuthorSerializer
 
 
 
