@@ -2,9 +2,9 @@ import os
 
 
 from django.shortcuts import get_object_or_404
-from django.http import FileResponse, Http404
+from django.http import FileResponse, Http404, HttpResponse
 from rest_framework import generics, viewsets, parsers, views
-
+from django_filters.rest_framework import DjangoFilterBackend
 from . import models, serializers
 from ..base.permissions  import IsAuthor
 from ..base.services import delete_old_file
@@ -35,6 +35,7 @@ class LicenseView(viewsets.ModelViewSet):
 
 
 class AlbumView(viewsets.ModelViewSet):
+    """ CRUD author of albums"""
 
     parser_classes = (parsers.MultiPartParser,)
 
@@ -56,7 +57,7 @@ class AlbumView(viewsets.ModelViewSet):
 
 
 class PubliAlbumView(generics.ListAPIView):
-
+    """ List of public authors albums """
 
     serializer_class = serializers.AlbumSerializer
 
@@ -93,6 +94,7 @@ class TrackView(MixedSerializer, viewsets.ModelViewSet):
 
 
 class PlayListView(MixedSerializer, viewsets.ModelViewSet):
+    """CRUD playlists of user"""
 
     parser_classes = (parsers.MultiPartParser,)
     permission_classes = [IsAuthor]
@@ -114,17 +116,21 @@ class PlayListView(MixedSerializer, viewsets.ModelViewSet):
 
 
 class TrackListView(generics.ListAPIView):
-
+    """ List of all tracks """
     queryset = models.Track.objects.filter(private=False)
     serializer_class = serializers.AuthorTrackSerializer
-    pagination_class = Pagination
+    #pagination_class = Pagination
+    filter_backends = [DjangoFilterBackend]
 
+    filterset_fields = ['title', 'user__display_name', 'album__name', 'genre__name']
 
 class AuthorTrackListView(generics.ListAPIView):
-
-
+    """ List of author tracks """
+    
     serializer_class = serializers.AuthorTrackSerializer
     pagination_class = Pagination
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['title', 'album__name', 'genre__name']
 
     def get_queryset(self):
         return models.Track.objects.filter(user__id=self.kwargs.get('pk'), album__private=False, private=False)
@@ -133,7 +139,7 @@ class AuthorTrackListView(generics.ListAPIView):
 
 
 class StreamingFileView(views.APIView):
-
+    """File playing"""
 
     def set_play(self, track):
         track.plays_count +=1
@@ -141,17 +147,36 @@ class StreamingFileView(views.APIView):
 
 
     def get(self, request, pk):
-        track  = get_object_or_404(models.Track, id=pk)
+        track  = get_object_or_404(models.Track, id=pk, private=False)
         if os.path.exists(track.file.path):
             self.set_play(track)
-            return FileResponse(open(track.file.path, 'rb'), filename=track.file.name)
-
+            response = HttpResponse('', content_type="audio/mpeg", status=206)
+            response['X-Accel-Redirect'] = f"/mp3/{self.track.file.name}"
+            return response
         else:
             return Http404
         
 
-class DownloadTrackView(views.APIView):
+class StreamingFileAuthorView(views.APIView):
+    """ Streaming tracks of author """
 
+    permission_classes = [IsAuthor]
+
+
+    def get(self, request, pk):
+        self.track = get_object_or_404(models.Track, id=pk, user=request.user)
+        if os.path.exists(self.track.file.path):
+            response = HttpResponse('', content_type="audio/mpeg", status=206)
+            response['X-Accel-Redirect'] = f"/mp3/{self.track.file.name}"
+            return response
+        else:
+            return Http404
+        
+    
+
+
+class DownloadTrackView(views.APIView):
+    """ File downloading"""
 
     def set_download(self):
         self.track.download += 1
@@ -162,4 +187,27 @@ class DownloadTrackView(views.APIView):
         self.track = get_object_or_404(models.Track, id=pk)
         if os.path.exists(self.track.file.path):
             self.set_download()
-            return FileResponse(open(self.track.file.path, 'rb'), filename=self.track.file.name, as_attachment=True)
+            response = HttpResponse('', content_type="audio/mpeg", status=206)
+            response['Content-Disposition'] = f"attachment; filename={self.track.file.name}"
+            response['X-Accel-Redirect'] = f"/mp3/{self.track.file.name}"
+
+
+
+class CommentAuthorView(viewsets.ModelViewSet):
+
+    serializer_class = serializers.CommentAuthorSerializer
+    permission_classes = [IsAuthor]
+
+    def get_queryset(self):
+        return models.Comment.objects.filter(user=self.request.user)
+    
+    def perform_create(self,serializer):
+        serializer.save(user=self.request.user)
+
+
+class CommentView(viewsets.ModelViewSet):
+
+    serializer_class = serializers.CommentSerializer
+
+    def get_queryset(self):
+        return models.Comment.objects.filter(track_id=self.kwargs.get('pk'))

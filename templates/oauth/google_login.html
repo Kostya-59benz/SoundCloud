@@ -63,7 +63,7 @@
             console.log("Email: " + responsePayload.payload.email);
 
             var email = responsePayload.payload.email
-            fetch('http://localhost:8000/api/v1/auth/google/', {
+            fetch('http://localhost/api/v1/auth/google/', {
                 method: 'POST',
                 headers: { 'Content-Type':'application/json;charset=UTF-8' },
                 body: JSON.stringify({
