@@ -3,18 +3,18 @@ from . import views
 
 
 urlpatterns = [
-    path('genre/', views.GenreView.as_view()),
+    path('genre/', views.GenreView.as_view(),name='genres'),
 
-    path('license/', views.LicenseView.as_view({'get': 'list', 'post': 'create'})),
-    path('license/<int:pk>/', views.LicenseView.as_view({'put': 'update', 'delete': 'destroy'})),
+    path('license/', views.LicenseView.as_view({'get': 'list', 'post': 'create'}), name='license'),
+    path('license/<int:pk>/', views.LicenseView.as_view({'put': 'update', 'delete': 'destroy'}), name='license_change'),
  
 
-    path('album/', views.AlbumView.as_view({'get': 'list', 'post': 'create'})),
+    path('album/', views.AlbumView.as_view({'get': 'list', 'post': 'create'}), name='album'),
     path('album/<int:pk>/', views.AlbumView.as_view({'put': 'update', 'delete': 'destroy'})),
 
     path('author-album/<int:pk>/', views.PubliAlbumView.as_view()),
 
-    path('track/', views.TrackView.as_view({'get': 'list', 'post': 'create'})),
+    path('track/', views.TrackView.as_view({'get': 'list', 'post': 'create'}), name='tracks'),
     path('track/<int:pk>/', views.TrackView.as_view({'put': 'update', 'delete': 'destroy'})),
 
 

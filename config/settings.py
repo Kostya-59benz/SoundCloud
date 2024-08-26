@@ -1,7 +1,11 @@
 
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 
+dotenv_path = os.path.join(os.path.dirname(__name__), '.env.dev')
+load_dotenv(dotenv_path=dotenv_path)
+    
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -12,11 +16,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get("SECRET_KEY", 'django-insecure-59!)1ya!j^weg-f-*bi9v8ic(xy=mh+&7tbo5+@33ik8^5b3cb')
 
-from dotenv import load_dotenv
 
-dotenv_path = os.path.join(os.path.dirname(__name__), '.env.dev')
-load_dotenv(dotenv_path=dotenv_path)
-    
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -33,11 +33,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
+    'src.oauth',
+    'src.audio_library',
     'silk',
     "corsheaders",
     'drf_yasg',
-    'src.oauth',
-    'src.audio_library',
     'django_filters',
 
     
@@ -75,17 +76,12 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
+
 
 DATABASES = {
-    "default": {
-        "ENGINE": os.environ.get("POSTGRES_ENGINE", "django.db.backends.sqlite3"),
-        "NAME": os.environ.get("POSTGRES_DB", os.path.join(BASE_DIR, "db.sqlite3")),
-        "USER": os.environ.get("POSTGRES_USER", "user"),
-        "PASSWORD": os.environ.get("POSTGRES_PASSWORD", "admin"),
-        "HOST": os.environ.get("POSTGRES_HOST", "localhost"),
-        "PORT": os.environ.get("POSTGRES_PORT", "5432"),
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
@@ -141,10 +137,11 @@ ALGORITHM = 'HS256'
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
 
 
-GOOGLE_CLIENT_ID ='807132324214-kqi2rrrqsf1bha57lah0nla6lqot4j17.apps.googleusercontent.com'
+GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
+GOOGLE_SECRET_KEY = os.environ.get('GOOGLE_SECRET_KEY')
 
-SPOTIFY_SECRET = '39fa55224a234e08ad18bf25d6cb0fa6'
-SPOTIFY_CLIENT_ID = '55ff74bef3a5445e90ed32496bb5f4bb'
+SPOTIFY_CLIENT_ID = os.environ.get('SPOTIFY_CLIENT_ID')
+SPOTIFY_SECRET_KEY = os.environ.get('SPOTIFY_SECRET_KEY')
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': ['src.oauth.services.auth_backend.AuthBackend',],

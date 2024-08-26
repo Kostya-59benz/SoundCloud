@@ -19,7 +19,7 @@ def check_google_auth(google_user: serializer.GoogleAuth) -> dict:
         raise AuthenticationFailed(code=403, detail="Bad Google data")
     
 
-
+    print(id_info)
     user, _ = AuthUser.objects.get_or_create(email=id_info['email'])
 
     return base_auth.create_token(user.id)

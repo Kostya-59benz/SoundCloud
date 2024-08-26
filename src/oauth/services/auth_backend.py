@@ -1,6 +1,5 @@
 from typing import Optional
 from datetime import datetime, timezone
-
 from rest_framework import authentication, exceptions
 from django.conf import settings
 from src.oauth.models import AuthUser
@@ -17,7 +16,6 @@ class AuthBackend(authentication.BaseAuthentication) :
         auth_header  = authentication.get_authorization_header(request).split()
         
         if not auth_header or auth_header[0].lower() != b'token':
-
             return None
 
         if len(auth_header) == 1:

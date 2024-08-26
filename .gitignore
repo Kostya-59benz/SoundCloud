@@ -123,6 +123,7 @@ celerybeat.pid
 
 # Environments
 .env
+.env.dev
 .venv
 env/
 venv/
@@ -166,3 +167,6 @@ drf_guide_part_1
 django_movie
 
 .gitkeep
+
+media/
+

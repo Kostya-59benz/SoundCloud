@@ -9,7 +9,9 @@ from . import models, serializers
 from ..base.permissions  import IsAuthor
 from ..base.services import delete_old_file
 from ..base.classes import MixedSerializer, Pagination
+from rest_framework.exceptions import PermissionDenied, AuthenticationFailed
 
+from .exceptions import custom_get_object_or_404
 
 class GenreView(generics.ListAPIView):
     """List of genres"""
@@ -24,15 +26,23 @@ class LicenseView(viewsets.ModelViewSet):
     """CRUD licenses of authors"""
 
     serializer_class = serializers.LicenseSerializer
-    permission_classes = [IsAuthor]
+    permission_class = [IsAuthor]
 
     def get_queryset(self):
+        if not isinstance(self.request.user, models.AuthUser):
+            raise AuthenticationFailed("")
+        
         return models.License.objects.filter(user=self.request.user)
+        
     
+        
+        
 
     def perform_create(self, serializer):
+        if not isinstance(self.request.user, models.AuthUser):
+            raise AuthenticationFailed("")
         serializer.save(user=self.request.user)
-
+    
 
 class AlbumView(viewsets.ModelViewSet):
     """ CRUD author of albums"""
@@ -44,7 +54,9 @@ class AlbumView(viewsets.ModelViewSet):
 
 
     def get_queryset(self):
-        return models.Album.objects.filter(user=self.request.user)
+        if not isinstance(self.request.user, models.AuthUser):
+            raise AuthenticationFailed("User is not authenticated.")
+        return models.Album.objects.filter(user=self.request.user,private=False)
     
 
     def perform_create(self, serializer):
@@ -80,6 +92,8 @@ class TrackView(MixedSerializer, viewsets.ModelViewSet):
 
 
     def get_queryset(self):
+        if not isinstance(self.request.user, models.AuthUser):
+            raise AuthenticationFailed("User is not authenticated.")
         return models.Track.objects.filter(user=self.request.user)
     
     def perform_create(self,serializer):
@@ -104,6 +118,8 @@ class PlayListView(MixedSerializer, viewsets.ModelViewSet):
     }
 
     def get_queryset(self):
+        if not isinstance(self.request.user, models.AuthUser):
+            raise AuthenticationFailed("User is not authenticated.")
         return models.PlayList.objects.filter(user=self.request.user)
     
     def perform_create(self,serializer):
@@ -142,14 +158,14 @@ class StreamingFileView(views.APIView):
     """File playing"""
 
     def set_play(self, track):
-        track.plays_count +=1
-        track.save()
+        self.track.plays_count +=1
+        self.track.save()
 
 
     def get(self, request, pk):
-        track  = get_object_or_404(models.Track, id=pk, private=False)
-        if os.path.exists(track.file.path):
-            self.set_play(track)
+        self.track  = custom_get_object_or_404(models.Track, id=pk, private=False)
+        if os.path.exists(self.track.file.path):
+            self.set_play(self.track)
             response = HttpResponse('', content_type="audio/mpeg", status=206)
             response['X-Accel-Redirect'] = f"/mp3/{self.track.file.name}"
             return response
@@ -164,7 +180,10 @@ class StreamingFileAuthorView(views.APIView):
 
 
     def get(self, request, pk):
-        self.track = get_object_or_404(models.Track, id=pk, user=request.user)
+        if not request.user.is_authenticated:
+            raise PermissionDenied("User is not authenticated")
+        self.track = custom_get_object_or_404(models.Track, id=pk, user=request.user, private=False)
+        print(self.track)
         if os.path.exists(self.track.file.path):
             response = HttpResponse('', content_type="audio/mpeg", status=206)
             response['X-Accel-Redirect'] = f"/mp3/{self.track.file.name}"
@@ -184,14 +203,15 @@ class DownloadTrackView(views.APIView):
 
 
     def get(self,request, pk):
-        self.track = get_object_or_404(models.Track, id=pk)
+        self.track = custom_get_object_or_404(models.Track, id=pk, private=False)
         if os.path.exists(self.track.file.path):
             self.set_download()
             response = HttpResponse('', content_type="audio/mpeg", status=206)
             response['Content-Disposition'] = f"attachment; filename={self.track.file.name}"
             response['X-Accel-Redirect'] = f"/mp3/{self.track.file.name}"
-
-
+            return response
+        else:
+            return Http404
 
 class CommentAuthorView(viewsets.ModelViewSet):
 
@@ -199,6 +219,8 @@ class CommentAuthorView(viewsets.ModelViewSet):
     permission_classes = [IsAuthor]
 
     def get_queryset(self):
+        if not isinstance(self.request.user, models.AuthUser):
+            raise AuthenticationFailed("User is not authenticated.")
         return models.Comment.objects.filter(user=self.request.user)
     
     def perform_create(self,serializer):
